@@ -1,49 +1,45 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+const express = require("express");
 const app = express();
-const port = 8080;
 
-app.use(bodyParser.json());
+app.use(express.json());
 
-// Route: /bfhl | Method: POST
-app.post('/bfhl', (req, res) => {
-  const { data } = req.body;
-  const userId = 'john_doe_17091999';
-  const email = 'john@xyz.com';
-  const rollNumber = 'ABCD123';
-  const numbers = [];
-  const alphabets = [];
-  const highestLowercaseAlphabet = [];
+app
+  .route("/bfhl")
+  .get((req, res) => {
+    res.status(200).json({ operation_code: 1 });
+  })
+  .post((req, res) => {
+    const data = req.body.data || [];
+    const numbers = [];
+    const alphabets = [];
+    let highest_alphabet = "";
 
-  data.forEach((item) => {
-    if (!isNaN(item)) {
-      numbers.push(item);
-    } else if (item.match(/[a-z]/i)) {
-      alphabets.push(item);
-      if (item === item.toLowerCase() && highestLowercaseAlphabet.length === 0) {
-        highestLowercaseAlphabet.push(item);
-      } else if (item === item.toLowerCase() && item > highestLowercaseAlphabet[0]) {
-        highestLowercaseAlphabet[0] = item;
+    for (const item of data) {
+      if (!isNaN(item)) {
+        numbers.push(item);
+      } else if (item.length === 1 && isNaN(item)) {
+        alphabets.push(item);
+        if (
+          !highest_alphabet ||
+          item.toUpperCase() > highest_alphabet.toUpperCase()
+        ) {
+          highest_alphabet = item;
+        }
       }
     }
+
+    res.json({
+      is_success: true,
+      user_id: "guptapuran",
+      email: "purankumar.gupta2021@vitstudent.ac.in",
+      roll_number: "21BCE2877",
+      numbers: numbers,
+      alphabets: alphabets,
+      highest_alphabet: highest_alphabet ? [highest_alphabet] : [],
+    });
   });
 
-  res.json({
-    is_success: true,
-    user_id: userId,
-    email,
-    roll_number: rollNumber,
-    numbers,
-    alphabets,
-    highest_lowercase_alphabet: highestLowercaseAlphabet,
-  });
-});
-
-// Route: /bfhl | Method: GET
-app.get('/bfhl', (req, res) => {
-  res.json({ operation_code: 1 });
-});
-
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log(`Server started on port ${port}`);
+  console.log(`Server running on http://localhost:${port}`);
 });
